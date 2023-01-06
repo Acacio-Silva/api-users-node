@@ -60,6 +60,43 @@ class User{
         
     }
 
+    async update(id, name, email, role){
+        var user = await this.findById(id);
+
+        if(user != undefined){
+            var editUser = {};
+            if(email != undefined){
+                if(email != user.email){
+                    var result = await this.findEmail(email);
+                    if(result == false){
+                        editUser.email = email;
+                    }else{
+                        return {status: false, err: "e email já existe no banco de dados"};            
+                    }
+                }
+            }
+            if(name != undefined){
+                editUser.name = name;
+            }
+            
+            if(role != undefined){
+                editUser.role = role;
+            }
+
+            try {
+                await knex.update(editUser).where({id:id}).table("users");
+                return {status: true}
+            } catch (error) {
+                return {status: false, err: error};            
+            }
+        }
+        else{
+            return {status: false, err: "usuario não existe"};
+        }
+
+
+    }
+
 }
 
 module.exports = new User();
